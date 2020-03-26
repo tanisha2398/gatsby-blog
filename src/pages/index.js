@@ -5,17 +5,44 @@ import Layout from "../components/layout"
 import Image from "../components/image"
 import SEO from "../components/seo"
 
-const IndexPage = () => (
-  <Layout>
-    <SEO title="Home" />
-    <h1>Hi people</h1>
-    <p>Welcome to your new Gatsby site.</p>
-    <p>Now go build something great.</p>
-    <div style={{ maxWidth: `300px`, marginBottom: `1.45rem` }}>
-      <Image />
-    </div>
-    <Link to="/page-2/">Go to page 2</Link>
-  </Layout>
-)
+const IndexPage = ({ data }) => {
+  const posts = data.allWordpressPost.edges
+  console.log(data.allWordpressPost.edges)
+  return (
+    <Layout>
+      <SEO title="home" />
+      <h1>Posts</h1>
+      {posts.map(({ node }) => (
+        <div key={node.id}>
+          <Link to={node.slug}>
+            {" "}
+            <h1>{node.title}</h1>
+          </Link>
+
+          <div dangerouslySetInnerHTML={{ __html: node.content }} />
+        </div>
+      ))}
+    </Layout>
+  )
+}
 
 export default IndexPage
+
+export const query = graphql`
+  query {
+    allWordpressPost(sort: { fields: [date] }) {
+      edges {
+        node {
+          slug
+          id
+          title
+          content
+          author {
+            name
+          }
+          date
+        }
+      }
+    }
+  }
+`
